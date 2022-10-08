@@ -1,10 +1,48 @@
 
 import { LockClosedIcon } from '@heroicons/react/20/solid'
+import Router, { useRouter } from 'next/router'
+import { FormEvent, useState } from 'react'
 import Cookie from "universal-cookie"
 
 const cookie = new Cookie()
 
-export const Login = () => {
+export const Auth = () => {
+  const router = useRouter()
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLogin, setIsLogin] = useState(true)
+
+  const login = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    console.log('call login API')
+    try {
+      //await fetch('https://api.freesimplebank.com/users/login', 
+      await fetch('http://localhost:8080/users/login', 
+      {
+        method: 'POST',
+        headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      }, 
+        body: JSON.stringify({username: username, password: password}),
+      })
+      .then((res) => {
+        if (res.status === 400) {
+          throw Error('authenticaton failed')
+        } else if (res.ok) {
+          return res.json()
+        }
+
+      })
+      .then((data) => {
+        const options = {path: '/'}
+        cookie.set('access_token', data.access, options)
+      })
+      router.push('/main-page')
+    } catch (err) {
+      alert(err)
+    }
+  }
 
     
     return (
@@ -27,21 +65,25 @@ export const Login = () => {
               </a>
             </p>
           </div>
-          <form className="mt-8 space-y-6" action="#" method="POST">
+          <form className="mt-8 space-y-6" onSubmit={login}>
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
-                <label htmlFor="email-address" className="sr-only">
-                  Email address
+                <label htmlFor="username" className="sr-only">
+                  username
                 </label>
                 <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
                   required
                   className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Email address"
+                  placeholder="username"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value)
+                  }}
                 />
               </div>
               <div>
@@ -56,6 +98,10 @@ export const Login = () => {
                   required
                   className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                  }}
                 />
               </div>
             </div>
