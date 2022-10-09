@@ -20,6 +20,6 @@
     "next-env.d.ts", 
     "src/**/*.ts", "src/**/*.tsx",
      "src/components/Home.tsx"
-  ],
+, "src/pages/Main.tsx", "src/components/Main.js", "src/components/Main.jsx"  ],
   "exclude": ["node_modules"]
 }

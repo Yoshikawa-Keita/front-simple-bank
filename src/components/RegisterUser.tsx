@@ -1,41 +1,38 @@
 import { LockClosedIcon } from '@heroicons/react/20/solid'
-import Link from 'next/link'
+import Link from 'next/dist/client/link'
 import Router, { useRouter } from 'next/router'
-import { FormEvent, useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import Cookie from 'universal-cookie'
 
 const cookie = new Cookie()
 
-export const Auth = () => {
+export const RegisterUser = () => {
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
 
-  const login = async (e: FormEvent<HTMLFormElement>) => {
+  const register = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('call login API')
+    console.log('call createUser API')
     try {
       //await fetch('https://api.freesimplebank.com/users/login',
-      await fetch('http://localhost:8080/users/login', {
+      await fetch('http://localhost:8080/users', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username: username, password: password })
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          full_name: fullName,
+          email: email,
+        })
       })
-        .then((res) => {
-          if (res.status === 400) {
-            throw Error('authenticaton failed')
-          } else if (res.ok) {
-            return res.json()
-          }
-        })
-        .then((data) => {
-          const options = { path: '/' }
-          cookie.set('access_token', data.access, options)
-        })
-      router.push('/Main')
+
+      router.push('/Login')
     } catch (err) {
       alert(err)
     }
@@ -52,10 +49,11 @@ export const Auth = () => {
               alt="Your Company"
             />
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-              Sign in to your account
+              Create your new account
             </h2>
+            
           </div>
-          <form className="mt-8 space-y-6" onSubmit={login}>
+          <form className="mt-8 space-y-6" onSubmit={register}>
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
@@ -94,31 +92,41 @@ export const Auth = () => {
                   }}
                 />
               </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  Remember me
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  FullName
                 </label>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="fullName"
+                  autoComplete="current-password"
+                  required
+                  className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  placeholder="FullName"
+                  value={fullName}
+                  onChange={(e) => {
+                    setFullName(e.target.value)
+                  }}
+                />
               </div>
-
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Forgot your password?
-                </a>
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="current-password"
+                  required
+                  className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                  }}
+                />
               </div>
             </div>
 
@@ -133,12 +141,12 @@ export const Auth = () => {
                     aria-hidden="true"
                   />
                 </span>
-                Sign in
+                Sign Up
               </button>
             </div>
-          </form>
-          <Link href="/register">
-                <a>create a new Account?</a>
+          </form> 
+          <Link href="/Login">
+                <a>Login to your Account?</a>
           </Link>
         </div>
       </div>
